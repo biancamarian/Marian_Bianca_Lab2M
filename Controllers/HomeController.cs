@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Marian_Bianca_Lab2.Data;
 using Marian_Bianca_Lab2.Models.LibraryViewModels;
-using Marian_Bianca_Lab2.Models.CustomerViewModels;
+
 
 namespace Marian_Bianca_Lab2.Controllers
 {
@@ -49,17 +49,6 @@ namespace Marian_Bianca_Lab2.Controllers
                                           };
             return View(await data.AsNoTracking().ToListAsync());
         }
-        public async Task<ActionResult> CustomerStatistics()
-        {
-            IQueryable<CustomerGroup> data =
-                from customer in _context.Customers
-                group customer by customer.Name into customerGroup
-                select new CustomerGroup()
-                {
-                    CustomerName = customerGroup.Key,
-                    BookCount = customerGroup.Count()
-                };
-            return View(await data.AsNoTracking().ToListAsync());
-        }
+        
     }
 }
