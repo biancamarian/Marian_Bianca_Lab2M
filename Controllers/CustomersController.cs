@@ -10,9 +10,11 @@ using Marian_Bianca_Lab2.Models;
 using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Marian_Bianca_Lab2.Controllers
 {
+    [Authorize(Policy = "SalesManager")]
     public class CustomersController : Controller
     {
         private readonly LibraryContext _context;

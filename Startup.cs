@@ -30,10 +30,28 @@ namespace Marian_Bianca_Lab2
             services.AddControllersWithViews();
             services.AddDbContext<LibraryContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddSignalR();
+            services.AddRazorPages();
             services.Configure<IdentityOptions>(options => {
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5); 
                 options.Lockout.MaxFailedAccessAttempts = 3; 
                 options.Lockout.AllowedForNewUsers = true;
+            });
+
+                services.AddAuthorization(opts => {
+                opts.AddPolicy("OnlySales", policy => {
+                    policy.RequireClaim("Departament", "Sales");
+                });
+            });
+
+            services.AddAuthorization(opts => {
+                opts.AddPolicy("SalesManager", policy => {
+                    policy.RequireRole("Manager");
+                    policy.RequireClaim("Departament", "Sales");
+                });
+            });
+            services.ConfigureApplicationCookie(opts =>
+            {
+                opts.AccessDeniedPath = "/Identity/Account/AccessDenied";
             });
         }
 
