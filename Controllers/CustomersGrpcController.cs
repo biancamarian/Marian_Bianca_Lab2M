@@ -44,68 +44,66 @@ namespace Marian_Bianca_Lab2.Controllers
         {
             if (id == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             var client = new CustomerService.CustomerServiceClient(channel);
-            var grpcCustomer = client.Get(new CustomerId() { Id = id.Value });
-            client.Update(grpcCustomer);
+            Customer customer = client.Get(new CustomerId() { Id = id.Value });
 
-            var customer = new Marian_Bianca_Lab2.Models.Customer()
+            if (customer == null)
             {
-                CustomerID = grpcCustomer.CustomerId,
-                Name = grpcCustomer.Name,
-                Adress = grpcCustomer.Adress
-            };
+                return NotFound();
+            }
 
             return View(customer);
         }
 
         [HttpPost]
-        public IActionResult Edit(Customer customer)
+        public IActionResult Edit (int id, Customer customer)
         {
+            if (id != customer.CustomerId)
+            {
+                return NotFound();
+            }
+
             if (ModelState.IsValid)
             {
                 var client = new CustomerService.CustomerServiceClient(channel);
-                customer = client.Get(new CustomerId() { Id = customer.CustomerId });
-                client.Update(customer);
+                Customer response = client.Update(customer);
 
                 return RedirectToAction(nameof(Index));
             }
-            return BadRequest();
+            return View(customer); ;
         }
 
         [HttpGet]
         public IActionResult Delete(int? id)
         {
-            var client = new CustomerService.CustomerServiceClient(channel);
+           
             if (id == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            var grpcCustomer = client.Get(new CustomerId() { Id = id.Value });
+            var client = new CustomerService.CustomerServiceClient(channel);
+            var grpcCustomer = client.Get(new CustomerId() { Id = (int) id });
 
-            var customer = new Marian_Bianca_Lab2.Models.Customer()
+            if (grpcCustomer == null)
             {
-                CustomerID = grpcCustomer.CustomerId,
-                Name = grpcCustomer.Name,
-                Adress = grpcCustomer.Adress
-            };
-
-            return View(customer);
+                return NotFound();
+            }
+            return View(grpcCustomer);
         }
 
-        [HttpPost]
-        public IActionResult Delete(int id)
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeleteConfirmed(int id)
         {
             var client = new CustomerService.CustomerServiceClient(channel);
 
-            //Customer customer = client.Get(new CustomerId() {Id = (int) id});
-            var customerId = new CustomerId() { Id = (int)id };
-
-            client.Delete(customerId);
-
+            Empty response = client.Delete(new CustomerId()
+            {
+                Id = id
+            });
             return RedirectToAction(nameof(Index));
         }
     }
